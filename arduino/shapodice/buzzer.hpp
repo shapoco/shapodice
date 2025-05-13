@@ -23,7 +23,8 @@ static constexpr uint8_t BUZZER_O1 = 2;
 static constexpr uint8_t BUZZER_O2 = 4;
 
 // ベース音程
-static constexpr uint8_t BUZZER_BASE_PERIOD = 200;
+static constexpr float BUZZER_C0_FREQ = 440.0 / BUZZER_F;
+static constexpr uint8_t BUZZER_BASE_PERIOD = 20e6 / BUZZER_C0_FREQ / 256;
 
 #define BUZZER_NOTE(oct, note, duration) \
   (uint8_t)(BUZZER_BASE_PERIOD / (BUZZER_##oct * BUZZER_##note)), (duration)

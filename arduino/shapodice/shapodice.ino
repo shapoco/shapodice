@@ -7,6 +7,7 @@
 #include <avr/sleep.h>
 #include <avr/interrupt.h>
 
+#include "tinyio.hpp"
 #include "dice_core.hpp"
 #include "dice_leds.hpp"
 #include "button.hpp"
@@ -35,14 +36,11 @@ static constexpr uint8_t BUZZER_PORT = 1;
 static constexpr uint8_t WAKEUP_PORT = 2;
 static constexpr uint8_t RESET_PORT = 5;
 
-// ノイズ生成用ポート
-static constexpr uint8_t NOISE_SENSE_PORT = 2;
-static constexpr uint8_t NOISE_ADC_CHANNEL = 1;
-
 #if !(ENABLE_DEBUG_SERIAL)
-// 起動メロディ
+// 起動音
 static constexpr uint8_t STARTUP_SOUND[] = {
-  BUZZER_NOTE(O0, G, 24),
+  BUZZER_NOTE(O1, C, 24),
+  BUZZER_NOTE(O1, E, 24),
   BUZZER_NOTE(O1, G, 24),
   BUZZER_FINISH(),
 };
@@ -80,8 +78,18 @@ Button<BUTTON_PORT> button;
 #if ENABLE_DEBUG_SERIAL
 static constexpr uint32_t DEBUG_BAUDRATE = 115200;
 SoftwareSerial debug(RESET_PORT, BUZZER_PORT);
+#define BUZZER_PLAY(sound) do {} while(false)
+#define BUZZER_STOP() do {} while(false)
+#define DEBUG_PRINT(val) debug.print(val);
+#define DEBUG_PRINTLN(val) debug.println(val);
+#define DEBUG_PRINTHEX(val) debug.print(val, HEX);
 #else
 Buzzer<BUZZER_PORT> buzzer;
+#define BUZZER_PLAY(sound) buzzer.play(sound)
+#define BUZZER_STOP() buzzer.stop()
+#define DEBUG_PRINT(val) do {} while(false)
+#define DEBUG_PRINTLN(val) do {} while(false)
+#define DEBUG_PRINTHEX(val) do {} while(false)
 #endif
 
 uint8_t startupTimerMs = STARTUP_DELAY_MS;
@@ -114,11 +122,9 @@ void loop() {
   if (startupTimerMs > 0) {
     if (button.read() == ButtonState::UP) {
       startupTimerMs--;
-#if ENABLE_DEBUG_SERIAL
       if (startupTimerMs == 0) {
-        debug.println("Started up.");
+        DEBUG_PRINTLN("Started up.");
       }
-#endif
     } else {
       startupTimerMs = STARTUP_DELAY_MS;
     }
@@ -128,19 +134,14 @@ void loop() {
         // スイッチ押下 --> サイコロ回転開始
         dice.startRolling();
         leds.stopBlink();
-#if ENABLE_DEBUG_SERIAL
-        debug.println("Button pushed-down.");
-#else
-        buzzer.play(ROLL_SOUND);
-#endif
+        DEBUG_PRINTLN("Button pushed-down.");
+        BUZZER_PLAY(ROLL_SOUND);
         break;
 
       case ButtonState::UP_EDGE:
         // スイッチ開放 --> サイコロ減速
         dice.startSlowdown();
-#if ENABLE_DEBUG_SERIAL
-        debug.println("Button released.");
-#endif
+        DEBUG_PRINTLN("Button released.");
         break;
     }
   }
@@ -153,17 +154,13 @@ void loop() {
   auto evt = dice.update();
   switch (evt) {
     case DiceEvent::ROLL:
-#if !(ENABLE_DEBUG_SERIAL)
       // サイコロ回転 --> 回転音を再生
-      buzzer.play(ROLL_SOUND);
-#endif
+      BUZZER_PLAY(ROLL_SOUND);
       break;
 
     case DiceEvent::STOP:
       // サイコロ停止 --> 点滅開始, 停止メロディ再生
-#if !(ENABLE_DEBUG_SERIAL)
-      buzzer.play(STOP_SOUND);
-#endif
+      BUZZER_PLAY(STOP_SOUND);
       leds.startBlink();
       break;
   }
@@ -172,12 +169,10 @@ void loop() {
     // 数字を LED 表示状態に反映
     uint8_t number = dice.last();
     leds.put(number);
-#if ENABLE_DEBUG_SERIAL
-    debug.print("Event#");
-    debug.print((uint8_t)evt);
-    debug.print(", Dice number: ");
-    debug.println(number);
-#endif
+    DEBUG_PRINT("Event#");
+    DEBUG_PRINT((uint8_t)evt);
+    DEBUG_PRINT(", Dice number: ");
+    DEBUG_PRINTLN(number);
   }
 
   // LED のダイナミック点灯
@@ -201,13 +196,12 @@ void startup() {
   debug.begin(DEBUG_BAUDRATE);
   debug.print("\x1b[!p");  // DECSTR
   debug.println();
-  debug.println();
 #else
   buzzer.begin();
 #endif
 
 #if !(ENABLE_DEBUG_SERIAL)
-  buzzer.play(STARTUP_SOUND);
+  BUZZER_PLAY(STARTUP_SOUND);
 #endif
 
   // 起動直後はボタンが開放されるまでボタンに応答しない
@@ -232,9 +226,7 @@ void loadRngState() {
     for (uint8_t i = 0; i < rngStateSize; i++) {
       rngState[i] = i;
     }
-#if ENABLE_DEBUG_SERIAL
-    debug.println("*W: RNG State all zero.");
-#endif
+    DEBUG_PRINTLN("*W: RNG State all zero.");
   }
 #if ENABLE_DEBUG_SERIAL
   dumpRngState();
@@ -251,29 +243,24 @@ void saveRngState() {
   for (uint8_t i = 0; i < rngStateSize; i++) {
     EEPROM.write(EEPROM_ADDR_RNG_STATE + i, rngState[i]);
   }
-#if ENABLE_DEBUG_SERIAL
-  debug.println("RNG state saved.");
-#endif
+  DEBUG_PRINTLN("RNG state saved.");
 }
 
-#if ENABLE_DEBUG_SERIAL
 void dumpRngState() {
   uint8_t rngStateSize = 0;
   uint8_t* rngState = dice.getRngStatePtr(&rngStateSize);
-  debug.print("RNG State: ");
+  DEBUG_PRINT("RNG State: ");
   for (uint8_t i = 0; i < rngStateSize; i++) {
-    debug.print(rngState[i], HEX);
-    debug.print(' ');
+    DEBUG_PRINTHEX(rngState[i]);
+    DEBUG_PRINT(' ');
   }
-  debug.println();
+  DEBUG_PRINTLN();
 }
-#endif
 
 // LED 消灯
 void ledReset() {
   // 全 LED ポートを入力 (Hi-Z) に指定
-  DDRB &= ~LED_PORT_MASK;
-  PORTB &= ~LED_PORT_MASK;
+  tinyio::multi::asInput(LED_PORT_MASK, tinyio::Pull::OFF);
 }
 
 // LED のダイナミック点灯
@@ -287,18 +274,26 @@ void ledScan() {
     // ポート番号が連続している場合はまとめて設定
     uint8_t out = sreg << LED_PORTS[0];
     uint8_t dir = sreg >> (4 - LED_PORTS[0]);
-    PORTB |= out & LED_PORT_MASK;
-    DDRB |= dir & LED_PORT_MASK;
+    tinyio::multi::putH(out & LED_PORT_MASK);
+    tinyio::multi::asOutput(dir & LED_PORT_MASK);
   } else {
     for (uint8_t i = 0; i < NUM_LED_PORTS; i++) {
       uint8_t pin = LED_PORTS[i];
-      pinMode(pin, (sreg & 1) ? OUTPUT : INPUT);
+      if (sreg & 1) {
+        tinyio::asOutput(pin);
+      } else {
+        tinyio::asInput(pin);
+      }
       sreg >>= 1;
     }
     sreg >>= 1;
     for (uint8_t i = 0; i < NUM_LED_PORTS; i++) {
       uint8_t pin = LED_PORTS[i];
-      digitalWrite(pin, sreg & 1);
+      if (sreg & 1) {
+        tinyio::putH(pin);
+      } else {
+        tinyio::putL(pin);
+      }
       sreg >>= 1;
     }
   }
@@ -326,9 +321,9 @@ void powerDown() {
   // 外部割り込み設定
   // プルアップ設定前に一旦 HIGH を出力して端子を充電する
   // これをしないとすぐ復帰する場合がある
-  pinMode(WAKEUP_PORT, OUTPUT);
-  digitalWrite(WAKEUP_PORT, HIGH);
-  pinMode(WAKEUP_PORT, INPUT_PULLUP);
+  tinyio::asOutput(WAKEUP_PORT);
+  tinyio::putH(WAKEUP_PORT);
+  tinyio::asInput(WAKEUP_PORT, tinyio::Pull::UP);
   attachInterrupt(WAKEUP_PORT, wakeup, RISING);
   GIMSK |= (1 << INT0);
 

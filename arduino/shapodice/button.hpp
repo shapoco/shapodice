@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include <stdio.h>
+#include "tinyio.hpp"
 
 enum class ButtonState : uint8_t {
   UP = 0b00,         // 開放中
@@ -23,15 +24,13 @@ public:
   ButtonState switchState = ButtonState::UP;
 
   void begin() {
-    pinMode(PORT, INPUT_PULLUP);
+    tinyio::asInput(PORT, tinyio::Pull::UP);
   }
 
   ButtonState read() {
-    bool swRaw = digitalRead(PORT) == LOW;
-
     // チャタリング除去用シフトレジスタ
     filter <<= 1;
-    if (swRaw) {
+    if (tinyio::isL(PORT)) {
       // LOW なら押下中
       filter |= 1;
     }
