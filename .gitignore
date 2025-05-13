@@ -1,0 +1,8 @@
+.theia/
+*-backups/
+tmp.*/
+
+_autosave-*
+\#auto_saved_files#
+*.lck
+tmp.*
