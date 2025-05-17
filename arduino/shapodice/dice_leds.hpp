@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include "tinyio.hpp"
 
 // LED a...e の並び
 // (a)       (b)
@@ -29,9 +30,14 @@
 //           +------|<]------+
 //                   f
 
+template<uint8_t PORT_X, uint8_t PORT_Y, uint8_t PORT_Z>
 class DiceLeds {
 public:
   static constexpr uint8_t NUM_ELEMENTS = 6;
+
+  static constexpr uint8_t NUM_PORTS = 3;
+  static constexpr uint8_t PORT_MASK = (1 << PORT_X) | (1 << PORT_Y) | (1 << PORT_Z);
+  static constexpr bool PORT_IS_SEQUENTIAL = (PORT_Y == PORT_X + 1) && (PORT_Z == PORT_X + 2);
 
   uint8_t state = 0;       // LED 点灯状態
   uint8_t scanIndex = 0;   // LED ダイナミック点灯用カウンタ
@@ -52,15 +58,14 @@ public:
     // bit 3: d
     // bit 4: e
     // bit 5: f (user defined)
-    constexpr uint8_t TABLE[] = {
-      0b10000,  // 1
-      0b00001,  // 2
-      0b01001,  // 3
-      0b00011,  // 4
-      0b01011,  // 5
-      0b00111,  // 6
-    };
-    state = TABLE[number];
+    switch (number) {
+      case 0: state = 0b10000; break;  // 1
+      case 1: state = 0b00001; break;  // 2
+      case 2: state = 0b01001; break;  // 3
+      case 3: state = 0b00011; break;  // 4
+      case 4: state = 0b01011; break;  // 5
+      case 5: state = 0b00111; break;  // 6
+    }
   }
 
   // ユーザー LED の設定
@@ -111,14 +116,47 @@ public:
       tmp |= 1 << (NUM_ELEMENTS - 1);
     }
 
+    uint8_t sreg = 0;
     if ((tmp >> idx) & 1) {
       switch (idx) {
-        case 0: return 0b00010011;  // a
-        case 1: return 0b00100011;  // b
-        case 2: return 0b00100110;  // c
-        case 3: return 0b01000110;  // d
-        case 4: return 0b00010101;  // e
-        case 5: return 0b01000101;  // f
+        case 0: sreg = 0b00010011; break;  // a
+        case 1: sreg = 0b00100011; break;  // b
+        case 2: sreg = 0b00100110; break;  // c
+        case 3: sreg = 0b01000110; break;  // d
+        case 4: sreg = 0b00010101; break;  // e
+        case 5: sreg = 0b01000101; break;  // f
+      }
+    }
+
+    // いったん消灯
+    tinyio::multi::asInput(PORT_MASK, tinyio::Pull::OFF);
+
+    // LED (a...f) に応じたポート設定を取得
+    if (PORT_IS_SEQUENTIAL) {
+      // ポート番号が連続している場合はまとめて設定
+      uint8_t dir = sreg << PORT_X;
+      uint8_t out = sreg >> (4 - PORT_X);
+      tinyio::multi::putH(out & PORT_MASK);
+      tinyio::multi::asOutput(dir & PORT_MASK);
+    } else {
+      for (uint8_t i = 0; i < NUM_PORTS; i++) {
+        uint8_t pin;
+        switch (i) {
+          case 0: pin = PORT_X; break;
+          case 1: pin = PORT_Y; break;
+          case 2: pin = PORT_Z; break;
+        }
+        if (sreg & 0x1) {
+          tinyio::asOutput(pin);
+        } else {
+          tinyio::asInput(pin);
+        }
+        if (sreg & 0x10) {
+          tinyio::putH(pin);
+        } else {
+          tinyio::putL(pin);
+        }
+        sreg >>= 1;
       }
     }
 

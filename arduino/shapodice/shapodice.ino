@@ -26,12 +26,9 @@
 //                              GND -|＿＿＿＿|- PB0 AREF AIN0 PCINT0 MOSI DI SDA OC0A OC1An
 
 // ポート番号
-static constexpr uint8_t NUM_LED_PORTS = 3;
-static constexpr uint8_t LED_PORTS[NUM_LED_PORTS] = { 0, 3, 4 };
-static constexpr uint8_t LED_PORT_MASK =
-  (1 << LED_PORTS[0]) | (1 << LED_PORTS[1]) | (1 << LED_PORTS[2]);
-static constexpr bool LED_PORT_IS_SEQUENTIAL =
-  (LED_PORTS[1] == LED_PORTS[0] + 1) && (LED_PORTS[2] == LED_PORTS[0] + 2);
+static constexpr uint8_t LED_PORT_X = 0;
+static constexpr uint8_t LED_PORT_Y = 3;
+static constexpr uint8_t LED_PORT_Z = 4;
 static constexpr uint8_t BUTTON_PORT = 2;
 static constexpr uint8_t BUZZER_PORT = 1;
 static constexpr uint8_t RESET_PORT = 5;
@@ -84,7 +81,7 @@ static constexpr uint8_t BATTERY_CHECK_INTERVAL_SEC = 2;
 static constexpr uint16_t EEPROM_ADDR_RNG_STATE = 0;
 
 DiceCore dice;
-DiceLeds leds;
+DiceLeds<LED_PORT_X, LED_PORT_Y, LED_PORT_Z> leds;
 Button<BUTTON_PORT> button;
 
 #if ENABLE_DEBUG_SERIAL
@@ -149,7 +146,6 @@ void setup() {
 // 起動直後の処理
 void startup() {
   // ペリフェラル設定
-  ledReset();
   button.begin();
   leds.begin();
 #if ENABLE_DEBUG_SERIAL
@@ -257,7 +253,7 @@ void loop() {
 
   // LED のダイナミック点灯
   leds.setUserLed(lowBattery && !(milliSecCounter & 0x200));
-  ledScan(pulse1sec);
+  leds.update();
 
 // サウンド再生
 #if !(ENABLE_DEBUG_SERIAL)
@@ -316,44 +312,6 @@ void dumpRngState() {
 
 // LED 消灯
 void ledReset() {
-  // 全 LED ポートを入力 (Hi-Z) に指定
-  tinyio::multi::asInput(LED_PORT_MASK, tinyio::Pull::OFF);
-}
-
-// LED のダイナミック点灯
-void ledScan(bool pulse1sec) {
-  // いったん消灯
-  ledReset();
-
-  // LED (a...f) に応じたポート設定を取得
-  uint8_t sreg = leds.update();
-  if (LED_PORT_IS_SEQUENTIAL) {
-    // ポート番号が連続している場合はまとめて設定
-    uint8_t dir = sreg << LED_PORTS[0];
-    uint8_t out = sreg >> (4 - LED_PORTS[0]);
-    tinyio::multi::putH(out & LED_PORT_MASK);
-    tinyio::multi::asOutput(dir & LED_PORT_MASK);
-  } else {
-    for (uint8_t i = 0; i < NUM_LED_PORTS; i++) {
-      uint8_t pin = LED_PORTS[i];
-      if (sreg & 1) {
-        tinyio::asOutput(pin);
-      } else {
-        tinyio::asInput(pin);
-      }
-      sreg >>= 1;
-    }
-    sreg >>= 1;
-    for (uint8_t i = 0; i < NUM_LED_PORTS; i++) {
-      uint8_t pin = LED_PORTS[i];
-      if (sreg & 1) {
-        tinyio::putH(pin);
-      } else {
-        tinyio::putL(pin);
-      }
-      sreg >>= 1;
-    }
-  }
 }
 
 // スリープ遅延カウンタリセット
