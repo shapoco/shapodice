@@ -2,24 +2,28 @@
 
 #include <stdint.h>
 
-// LED a...d の並び
-// (a)     (b)
-// (c) (d) (c)
-// (b)     (a)
+// LED a...e の並び
+// (a)       (b)
+// (c) (d,e) (c)
+// (b)       (a)
+
+// a...d: white
+//     e: red
 
 // ポートと LED の接続
 // portX           portY           portZ
 //   |   a           |           c   |
-//   +--[>|--+       |       +--|<]--+
+//   +--[>|--+       |       +--[>|--+
 //   |       +--VVV--+--VVV--+       |
-//   +--|<]--+       |       +--[>|--+
+//   +--|<]--+       |       +--|<]--+
 //   |   b           |           d   |
 //   |               |               |
 //   |   a           |               |
 //   +--[>|--+       |           c   |
-//   |       +--VVV--+--VVV-----|<]--+
-//   +--|<]--+
-//       b
+//   |       +--VVV--+--VVV-----[>|--+
+//   +--|<]--+                       |
+//   |   b           e               |
+//   +--------------[>|--------------+
 
 class DiceLeds {
 public:
@@ -41,15 +45,16 @@ public:
     // bit 1: b
     // bit 2: c
     // bit 3: d
+    // bit 4: e
     constexpr uint8_t TABLE[] = {
-      0b1000,  // 1
-      0b0001,  // 2
-      0b1001,  // 3
-      0b0011,  // 4
-      0b1011,  // 5
-      0b0111   // 6
+      0b10000,  // 1
+      0b00001,  // 2
+      0b01001,  // 3
+      0b00011,  // 4
+      0b01011,  // 5
+      0b00111,  // 6
     };
-    state &= 0xf0;
+    state &= 0xe0;
     state |= TABLE[number];
   }
 
@@ -66,13 +71,13 @@ public:
   }
 
   // LED の点灯状態を更新してポートのドライブ状態を返す
-  // bit 0: portX の digitalWrite の値
-  // bit 1: portY の digitalWrite の値
-  // bit 2: portZ の digitalWrite の値
+  // bit 0: portX の pinMode の値
+  // bit 1: portY の pinMode の値
+  // bit 2: portZ の pinMode の値
   // bit 3: reserved
-  // bit 4: portX の pinMode の値
-  // bit 5: portY の pinMode の値
-  // bit 6: portZ の pinMode の値
+  // bit 4: portX の digitalWrite の値
+  // bit 5: portY の digitalWrite の値
+  // bit 6: portZ の digitalWrite の値
   // bit 7: reserved
   uint8_t update() {
     uint8_t idx = scanIndex;
@@ -93,11 +98,11 @@ public:
 
     if (ledOn) {
       switch (idx) {
-        case 0: return 0b00110001;  // a
-        case 1: return 0b00110010;  // b
-        case 2: return 0b01100100;  // c
-        case 3: return 0b01100010;  // d
-        case 4: return 0b01010001;  // e
+        case 0: return 0b00010011;  // a
+        case 1: return 0b00100011;  // b
+        case 2: return 0b00100110;  // c
+        case 3: return 0b01000110;  // d
+        case 4: return 0b00010101;  // e
       }
     }
 

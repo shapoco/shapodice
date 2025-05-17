@@ -23,7 +23,11 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. */
 
 #include <stdint.h>
 
-static inline uint32_t rotl(const uint32_t x, int k) {
+static inline uint32_t rotl(uint32_t x, uint8_t k) {
+	if (k >= 8) {
+		x = ((x << 24) & 0xff000000) | ((x >> 8) & 0x00ffffff);
+		k -= 8;
+	}
 	return (x << k) | (x >> (32 - k));
 }
 

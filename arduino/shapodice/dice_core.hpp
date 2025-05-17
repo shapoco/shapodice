@@ -18,7 +18,7 @@ public:
   static constexpr uint8_t ROLLING_SPEED_HZ = 20;
 
   // サイコロ回転スピードの精度 (大きいほどスイッチ開放から停止までの時間が延びる)
-  static constexpr uint8_t ROLLING_SPEED_PREC = 3;
+  static constexpr uint8_t ROLLING_SPEED_PREC = 2;
 
   // サイコロ回転タイマーの周期
   static constexpr uint16_t ROLLING_TIMER_PERIOD = 32768;
@@ -32,6 +32,11 @@ public:
   // 現在の数字
   uint8_t last() const {
     return number;
+  }
+
+  // 回転中か否か
+  bool isRolling() const {
+    return (rollingSpeed != 0);
   }
 
   void begin() {

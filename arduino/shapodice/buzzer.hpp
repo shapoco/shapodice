@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include <stdio.h>
+#include "tinyio.hpp"
 
 // 音程
 static constexpr float BUZZER_C = 1.000000000;
@@ -45,8 +46,19 @@ public:
     // nothing to do
   }
 
+  // 演奏中か否か
+  bool isPlaying() {
+    return durationRemain != 0;
+  }
+
   // サウンド再生開始
   void play(const uint8_t *ptr) {
+    // PWM 有効化
+    if (PORT == 1) {
+      TCCR1 |= (1 << PWM1A) | (3 << COM1A0);
+    } else {
+      GTCCR |= (1 << PWM1B) | (3 << COM1B0);
+    }
     if (ptr) {
       cursor = ptr;        // 音符ポインタ初期化
       durationRemain = 0;  // 音の長さ初期化
@@ -86,7 +98,17 @@ public:
 
   // サウンド演奏停止
   void stop() {
-    analogWrite(PORT, 0);
+    // PWM 停止
+    if (PORT == 1) {
+      TCCR1 &= ~((1 << PWM1A) | (3 << COM1A0));
+      GTCCR |= (1 << FOC1A);
+    } else {
+      GTCCR &= ~((1 << PWM1B) | (3 << COM1B0));
+      GTCCR |= (1 << FOC1B);
+    }
+    OCR1A = 0;
+    // ピン開放
+    tinyio::asInput(PORT, tinyio::Pull::UP);
     cursor = nullptr;
   }
 };

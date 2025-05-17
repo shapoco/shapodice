@@ -1,5 +1,7 @@
 #define ENABLE_DEBUG_SERIAL (0)
 
+#define SHAPODICE_INLINE inline __attribute__((always_inline))
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -11,11 +13,10 @@
 #include "dice_core.hpp"
 #include "dice_leds.hpp"
 #include "button.hpp"
+#include "buzzer.hpp"
 
 #if ENABLE_DEBUG_SERIAL
 #include <SoftwareSerial.h>
-#else
-#include "buzzer.hpp"
 #endif
 
 // ピン配置
@@ -26,17 +27,26 @@
 
 // ポート番号
 static constexpr uint8_t NUM_LED_PORTS = 3;
-static constexpr uint8_t LED_PORTS[NUM_LED_PORTS] = { 2, 3, 4 };
+static constexpr uint8_t LED_PORTS[NUM_LED_PORTS] = { 0, 3, 4 };
 static constexpr uint8_t LED_PORT_MASK =
   (1 << LED_PORTS[0]) | (1 << LED_PORTS[1]) | (1 << LED_PORTS[2]);
 static constexpr bool LED_PORT_IS_SEQUENTIAL =
   (LED_PORTS[1] == LED_PORTS[0] + 1) && (LED_PORTS[2] == LED_PORTS[0] + 2);
-static constexpr uint8_t BUTTON_PORT = 0;
+static constexpr uint8_t BUTTON_PORT = 2;
 static constexpr uint8_t BUZZER_PORT = 1;
-static constexpr uint8_t WAKEUP_PORT = 2;
 static constexpr uint8_t RESET_PORT = 5;
 
-#if !(ENABLE_DEBUG_SERIAL)
+#if !defined(ADC_INTERNAL1V1)
+#define ADC_INTERNAL1V1 (0x0C)
+#endif
+static constexpr uint8_t BATTERY_ADC = ADC_INTERNAL1V1;
+
+// バッテリー定電圧閾値 (mV)
+static constexpr uint16_t LOW_BATTERY_THRESH_MV = 3.3 * 1000;
+
+// バッテリー定電圧閾値 (ADC値)
+static constexpr uint16_t LOW_BATTERY_THRESH_ADC = 1100.0 * 1024 / LOW_BATTERY_THRESH_MV;
+
 // 起動音
 static constexpr uint8_t STARTUP_SOUND[] = {
   BUZZER_NOTE(O1, C, 24),
@@ -60,13 +70,15 @@ static constexpr uint8_t STOP_SOUND[] = {
   BUZZER_NOTE(O2, C, 24 * 4),
   BUZZER_FINISH(),
 };
-#endif
 
 // 起動の遅延時間
 static constexpr uint8_t STARTUP_DELAY_MS = 100;
 
 // スリープまでの時間
-static constexpr uint8_t POWER_DOWN_DELAY_SEC = 5;
+static constexpr uint8_t POWER_DOWN_DELAY_SEC = 15;
+
+// 電源電圧測定間隔
+static constexpr uint8_t BATTERY_CHECK_INTERVAL_SEC = 2;
 
 // EEPROM アドレス
 static constexpr uint16_t EEPROM_ADDR_RNG_STATE = 0;
@@ -78,43 +90,107 @@ Button<BUTTON_PORT> button;
 #if ENABLE_DEBUG_SERIAL
 static constexpr uint32_t DEBUG_BAUDRATE = 115200;
 SoftwareSerial debug(RESET_PORT, BUZZER_PORT);
-#define BUZZER_PLAY(sound) do {} while(false)
-#define BUZZER_STOP() do {} while(false)
-#define DEBUG_PRINT(val) debug.print(val);
-#define DEBUG_PRINTLN(val) debug.println(val);
-#define DEBUG_PRINTHEX(val) debug.print(val, HEX);
 #else
 Buzzer<BUZZER_PORT> buzzer;
-#define BUZZER_PLAY(sound) buzzer.play(sound)
-#define BUZZER_STOP() buzzer.stop()
-#define DEBUG_PRINT(val) do {} while(false)
-#define DEBUG_PRINTLN(val) do {} while(false)
-#define DEBUG_PRINTHEX(val) do {} while(false)
 #endif
 
 uint8_t startupTimerMs = STARTUP_DELAY_MS;
-uint16_t powerDownTimerMs = 0;
-uint8_t powerDownTimerSec = 0;
+uint16_t milliSecCounter = 0;
+uint8_t powerDownTimerSec = POWER_DOWN_DELAY_SEC;
+uint8_t batteryCheckTimerSec = 0;
+bool lowBattery = false;
+
+static SHAPODICE_INLINE void buzzer_play(const uint8_t* sound) {
+#if !(ENABLE_DEBUG_SERIAL)
+  buzzer.play(sound);
+#endif
+}
+
+static SHAPODICE_INLINE void buzzer_stop() {
+#if !(ENABLE_DEBUG_SERIAL)
+  buzzer.stop();
+#endif
+}
+
+// clang-format off
+#if ENABLE_DEBUG_SERIAL
+#define DEBUG_PRINT(val) debug.print(val);
+#define DEBUG_PRINTLN(val) debug.println(val);
+#else
+#define DEBUG_PRINT(val) do { } while (false)
+#define DEBUG_PRINTLN(val) do { } while (false)
+#endif
+// clang-format on
+
+static void DEBUG_PRINTHEX(uint8_t val) {
+#if ENABLE_DEBUG_SERIAL
+  char buf[3];
+  uint8_t tmp = val;
+  uint8_t i = 3;
+  buf[--i] = '\0';
+  do {
+    uint8_t digit = tmp & 0xf;
+    buf[--i] = ((digit < 10) ? '0' : ('a' - 10)) + digit;
+    tmp >>= 4;
+  } while (i != 0);
+  debug.print(buf);
+#endif
+}
 
 // 初期設定
 void setup() {
   startup();
   leds.put(0);
   loadRngState();
+  dice.rng.next();
+  saveRngState();
+}
+
+// 起動直後の処理
+void startup() {
+  // ペリフェラル設定
+  ledReset();
+  button.begin();
+  leds.begin();
+#if ENABLE_DEBUG_SERIAL
+  debug.begin(DEBUG_BAUDRATE);
+  debug.print("\x1b[!p");  // DECSTR
+  debug.println();
+#else
+  buzzer.begin();
+#endif
+
+  // ADC 有効化 + 空読み
+  ADCSRA |= (1 << ADEN) | (0x7 << ADPS0);
+  for (uint8_t i = 3; i != 0; i--) {
+    analogRead(BATTERY_ADC);
+  }
+
+#if !(ENABLE_DEBUG_SERIAL)
+  buzzer_play(STARTUP_SOUND);
+#endif
+
+  // 起動直後はボタンが開放されるまでボタンに応答しない
+  startupTimerMs = STARTUP_DELAY_MS;
+
+  // 各種タイマの初期化
+  resetPowerDownTimer();
+  resetBatteryCheckTimer();
+  milliSecCounter = 0;
 }
 
 // ループ処理
 void loop() {
-  // パワーダウン制御
-  powerDownTimerMs++;
-  if (powerDownTimerMs >= 1000) {
-    powerDownTimerMs = 0;
-    powerDownTimerSec++;
-    if (powerDownTimerSec > POWER_DOWN_DELAY_SEC) {
-      powerDown();
-      return;
-    }
+  // 秒毎の処理
+  bool pulse1sec = (milliSecCounter == 0);
+  if (pulse1sec) {
+    milliSecCounter = 999;
+  } else {
+    milliSecCounter--;
   }
+
+  // パワーダウン制御
+  powerDownControl(pulse1sec);
 
   // スイッチの状態読み取り
   ButtonState btn = button.read();
@@ -135,7 +211,7 @@ void loop() {
         dice.startRolling();
         leds.stopBlink();
         DEBUG_PRINTLN("Button pushed-down.");
-        BUZZER_PLAY(ROLL_SOUND);
+        buzzer_play(ROLL_SOUND);
         break;
 
       case ButtonState::UP_EDGE:
@@ -146,21 +222,21 @@ void loop() {
     }
   }
 
-  if (btn != ButtonState::UP) {
-    // ボタンが押されている間スリープまでの時間を延長
-    resetSleepDelay();
+  if (btn != ButtonState::UP || dice.isRolling()) {
+    // ボタンが押されている間と回転痛はパワーダウンまでの時間を延長
+    resetPowerDownTimer();
   }
 
   auto evt = dice.update();
   switch (evt) {
     case DiceEvent::ROLL:
       // サイコロ回転 --> 回転音を再生
-      BUZZER_PLAY(ROLL_SOUND);
+      buzzer_play(ROLL_SOUND);
       break;
 
     case DiceEvent::STOP:
       // サイコロ停止 --> 点滅開始, 停止メロディ再生
-      BUZZER_PLAY(STOP_SOUND);
+      buzzer_play(STOP_SOUND);
       leds.startBlink();
       break;
   }
@@ -176,39 +252,27 @@ void loop() {
   }
 
   // LED のダイナミック点灯
-  ledScan();
+  ledScanWithBatteryCheck(pulse1sec);
 
-  // サウンド再生
+// サウンド再生
 #if !(ENABLE_DEBUG_SERIAL)
   buzzer.update();
+  if (!buzzer.isPlaying()) {
+    // ブザー端子に繋がった LED でバッテリー状態表示
+    if (lowBattery) {
+      tinyio::asOutput(BUZZER_PORT);
+      if (milliSecCounter & 0x200) {
+        tinyio::putH(BUZZER_PORT);
+      } else {
+        tinyio::putL(BUZZER_PORT);
+      }
+    } else {
+      tinyio::asInput(BUZZER_PORT, tinyio::Pull::UP);
+    }
+  }
 #endif
 
   delay(1);
-}
-
-// 起動直後の処理
-void startup() {
-  // ペリフェラル設定
-  ledReset();
-  button.begin();
-  leds.begin();
-#if ENABLE_DEBUG_SERIAL
-  debug.begin(DEBUG_BAUDRATE);
-  debug.print("\x1b[!p");  // DECSTR
-  debug.println();
-#else
-  buzzer.begin();
-#endif
-
-#if !(ENABLE_DEBUG_SERIAL)
-  BUZZER_PLAY(STARTUP_SOUND);
-#endif
-
-  // 起動直後はボタンが開放されるまでボタンに応答しない
-  startupTimerMs = STARTUP_DELAY_MS;
-
-  // パワーダウン遅延タイマの初期化
-  resetSleepDelay();
 }
 
 // 乱数生成器の状態をロード
@@ -228,6 +292,7 @@ void loadRngState() {
     }
     DEBUG_PRINTLN("*W: RNG State all zero.");
   }
+  DEBUG_PRINTLN("RNG state loaded.");
 #if ENABLE_DEBUG_SERIAL
   dumpRngState();
 #endif
@@ -264,16 +329,19 @@ void ledReset() {
 }
 
 // LED のダイナミック点灯
-void ledScan() {
+void ledScanWithBatteryCheck(bool pulse1sec) {
   // いったん消灯
   ledReset();
+
+  // 消灯中にバッテリーチェック
+  batteryCheck(pulse1sec);
 
   // LED (a...d) に応じたポート設定を取得
   uint8_t sreg = leds.update();
   if (LED_PORT_IS_SEQUENTIAL) {
     // ポート番号が連続している場合はまとめて設定
-    uint8_t out = sreg << LED_PORTS[0];
-    uint8_t dir = sreg >> (4 - LED_PORTS[0]);
+    uint8_t dir = sreg << LED_PORTS[0];
+    uint8_t out = sreg >> (4 - LED_PORTS[0]);
     tinyio::multi::putH(out & LED_PORT_MASK);
     tinyio::multi::asOutput(dir & LED_PORT_MASK);
   } else {
@@ -300,31 +368,38 @@ void ledScan() {
 }
 
 // スリープ遅延カウンタリセット
-void resetSleepDelay() {
-  powerDownTimerMs = 0;
-  powerDownTimerSec = 0;
+void resetPowerDownTimer() {
+  powerDownTimerSec = POWER_DOWN_DELAY_SEC;
 }
 
 // パワーダウン
-void powerDown() {
-  // LED 消灯
-  ledReset();
+void powerDownControl(bool pulse1sec) {
+  if (powerDownTimerSec != 0) {
+    if (pulse1sec) {
+      DEBUG_PRINT("Power down timer: ");
+      DEBUG_PRINTLN(powerDownTimerSec);
+      powerDownTimerSec--;
+    }
+    return;
+  }
+  powerDownTimerSec = 0;
+
+  // 全ポートを内部プルアップに設定
+  tinyio::multi::asInput(0xff, tinyio::Pull::UP);
 
   // 乱数の内部状態を保存
   saveRngState();
 
 #if ENABLE_DEBUG_SERIAL
-  debug.println("Power Down...");
+  debug.println("Power down...");
   debug.end();
 #endif
 
+  // ADC 無効化
+  ADCSRA &= ~((1 << ADEN) | (0x7 << ADPS0));
+
   // 外部割り込み設定
-  // プルアップ設定前に一旦 HIGH を出力して端子を充電する
-  // これをしないとすぐ復帰する場合がある
-  tinyio::asOutput(WAKEUP_PORT);
-  tinyio::putH(WAKEUP_PORT);
-  tinyio::asInput(WAKEUP_PORT, tinyio::Pull::UP);
-  attachInterrupt(WAKEUP_PORT, wakeup, RISING);
+  attachInterrupt(BUTTON_PORT, wakeup, RISING);
   GIMSK |= (1 << INT0);
 
   // -------- ここから変更禁止 --------
@@ -340,7 +415,7 @@ void powerDown() {
 
   // 外部割り込み無効化
   GIMSK &= ~(1 << INT0);
-  detachInterrupt(WAKEUP_PORT);
+  detachInterrupt(BUTTON_PORT);
 
   // ペリフェラル再初期化
   startup();
@@ -352,4 +427,41 @@ void powerDown() {
 }
 
 void wakeup() {
+}
+
+void resetBatteryCheckTimer() {
+  batteryCheckTimerSec = 0;
+}
+
+// 電源電圧測定
+void batteryCheck(bool pulse1sec) {
+  if (batteryCheckTimerSec != 0) {
+    if (pulse1sec) {
+      DEBUG_PRINT("Battery check timer: ");
+      DEBUG_PRINTLN(batteryCheckTimerSec);
+      batteryCheckTimerSec--;
+    }
+    return;
+  }
+  batteryCheckTimerSec = BATTERY_CHECK_INTERVAL_SEC;
+
+  // 電源電圧に対する内部基準電圧 1.1V の値を測る
+  uint16_t adcVal = analogRead(BATTERY_ADC);
+
+  // 1.1V の ADC 値が閾値以上なら定電圧判定
+  lowBattery = adcVal >= LOW_BATTERY_THRESH_ADC;
+
+#if ENABLE_DEBUG_SERIAL
+  uint16_t milliVolt = (uint32_t)(1.1 * 1024 * 1000) / adcVal;
+  DEBUG_PRINT("Battery ADC value: ");
+  DEBUG_PRINT(adcVal);
+  DEBUG_PRINT(" (");
+  DEBUG_PRINT(milliVolt);
+  DEBUG_PRINT("mV)");
+  if (lowBattery) {
+    DEBUG_PRINTLN(" LOW BATTERY !!");
+  } else {
+    DEBUG_PRINTLN();
+  }
+#endif
 }
