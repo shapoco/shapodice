@@ -7,32 +7,37 @@
 // (c) (d,e) (c)
 // (b)       (a)
 
-// a...d: white
-//     e: red
+// a-d: 白 (Vf=3V)
+// e-f: 赤 (Vf=1.5V)
 
 // ポートと LED の接続
 // portX           portY           portZ
-//   |   a           |           c   |
-//   +--[>|--+       |       +--[>|--+
-//   |       +--VVV--+--VVV--+       |
-//   +--|<]--+       |       +--|<]--+
-//   |   b           |           d   |
+//   |           a   |   c           |
+//   |       +--[>|--+--[>|-----VVV--+
+//   +--VVV--|       |               |
+//   |       +--|<]--+               |
+//   |           b   |               |
 //   |               |               |
-//   |   a           |               |
-//   +--[>|--+       |           c   |
-//   |       +--VVV--+--VVV-----[>|--+
-//   +--|<]--+                       |
-//   |   b           e               |
-//   +--------------[>|--------------+
+//   |           a   |   c           |
+//   |       +--[>|--+--[>|--+       |
+//   +--VVV--|       |       +--VVV--+
+//           +--|<]--+--|<]--+
+//           |   b       d   |
+//           |       e       |
+//           +------[>|------+
+//           |               |
+//           +------|<]------+
+//                   f
 
 class DiceLeds {
 public:
-  static constexpr uint8_t NUM_ELEMENTS = 5;
+  static constexpr uint8_t NUM_ELEMENTS = 6;
 
   uint8_t state = 0;       // LED 点灯状態
   uint8_t scanIndex = 0;   // LED ダイナミック点灯用カウンタ
   uint8_t blinkTimer = 0;  // 点滅用タイマー
   uint8_t blinkCount = 0;  // 点滅残り回数
+  bool userLed = false;    // ユーザー LED
 
   void begin() {
     // nothing to do
@@ -46,6 +51,7 @@ public:
     // bit 2: c
     // bit 3: d
     // bit 4: e
+    // bit 5: f (user defined)
     constexpr uint8_t TABLE[] = {
       0b10000,  // 1
       0b00001,  // 2
@@ -54,8 +60,12 @@ public:
       0b01011,  // 5
       0b00111,  // 6
     };
-    state &= 0xe0;
-    state |= TABLE[number];
+    state = TABLE[number];
+  }
+
+  // ユーザー LED の設定
+  void setUserLed(bool val) {
+    userLed = val;
   }
 
   // 点滅開始
@@ -83,7 +93,7 @@ public:
     uint8_t idx = scanIndex;
     if (++scanIndex >= NUM_ELEMENTS) scanIndex = 0;
 
-    bool ledOn = state != 0;
+    uint8_t tmp = state;
 
     if (blinkCount) {
       // 点滅中
@@ -91,18 +101,24 @@ public:
         blinkCount--;
       }
       blinkTimer--;
-      if (blinkCount & 1) ledOn = false;
+      if (blinkCount & 1) {
+        tmp = 0;
+      }
     }
 
-    ledOn = ledOn && ((state >> idx) & 1);
+    if (userLed) {
+      // ユーザーLED
+      tmp |= 1 << (NUM_ELEMENTS - 1);
+    }
 
-    if (ledOn) {
+    if ((tmp >> idx) & 1) {
       switch (idx) {
         case 0: return 0b00010011;  // a
         case 1: return 0b00100011;  // b
         case 2: return 0b00100110;  // c
         case 3: return 0b01000110;  // d
         case 4: return 0b00010101;  // e
+        case 5: return 0b01000101;  // f
       }
     }
 

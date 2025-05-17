@@ -156,6 +156,7 @@ void startup() {
   debug.begin(DEBUG_BAUDRATE);
   debug.print("\x1b[!p");  // DECSTR
   debug.println();
+  tinyio::asOutput(BUZZER_PORT);
 #else
   buzzer.begin();
 #endif
@@ -191,6 +192,9 @@ void loop() {
 
   // パワーダウン制御
   powerDownControl(pulse1sec);
+
+  // バッテリーチェック
+  batteryCheck(pulse1sec);
 
   // スイッチの状態読み取り
   ButtonState btn = button.read();
@@ -252,24 +256,12 @@ void loop() {
   }
 
   // LED のダイナミック点灯
-  ledScanWithBatteryCheck(pulse1sec);
+  leds.setUserLed(lowBattery && !(milliSecCounter & 0x200));
+  ledScan(pulse1sec);
 
 // サウンド再生
 #if !(ENABLE_DEBUG_SERIAL)
   buzzer.update();
-  if (!buzzer.isPlaying()) {
-    // ブザー端子に繋がった LED でバッテリー状態表示
-    if (lowBattery) {
-      tinyio::asOutput(BUZZER_PORT);
-      if (milliSecCounter & 0x200) {
-        tinyio::putH(BUZZER_PORT);
-      } else {
-        tinyio::putL(BUZZER_PORT);
-      }
-    } else {
-      tinyio::asInput(BUZZER_PORT, tinyio::Pull::UP);
-    }
-  }
 #endif
 
   delay(1);
@@ -329,14 +321,11 @@ void ledReset() {
 }
 
 // LED のダイナミック点灯
-void ledScanWithBatteryCheck(bool pulse1sec) {
+void ledScan(bool pulse1sec) {
   // いったん消灯
   ledReset();
 
-  // 消灯中にバッテリーチェック
-  batteryCheck(pulse1sec);
-
-  // LED (a...d) に応じたポート設定を取得
+  // LED (a...f) に応じたポート設定を取得
   uint8_t sreg = leds.update();
   if (LED_PORT_IS_SEQUENTIAL) {
     // ポート番号が連続している場合はまとめて設定
