@@ -72,10 +72,10 @@ static constexpr uint8_t STOP_SOUND[] = {
 static constexpr uint8_t STARTUP_DELAY_MS = 100;
 
 // スリープまでの時間
-static constexpr uint8_t POWER_DOWN_DELAY_SEC = 15;
+static constexpr uint8_t POWER_DOWN_DELAY_SEC = 60;
 
 // 電源電圧測定間隔
-static constexpr uint8_t BATTERY_CHECK_INTERVAL_SEC = 2;
+static constexpr uint8_t BATTERY_CHECK_INTERVAL_SEC = 10;
 
 // EEPROM アドレス
 static constexpr uint16_t EEPROM_ADDR_RNG_STATE = 0;
