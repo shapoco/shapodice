@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdint.h>
-#include "xoshiro128plusplus.hpp"
+#include "xoroshiro128plusplus.hpp"
 
 enum class DiceEvent : uint8_t {
   NONE = 0,
@@ -23,7 +23,7 @@ public:
   // サイコロ回転タイマーの周期
   static constexpr uint16_t ROLLING_TIMER_PERIOD = 32768;
 
-  Xoshiro128plusplus rng;     // 乱数生成器
+  Xoroshiro128plusplus rng;     // 乱数生成器
   bool buttonPressed = 0;     // ボタン押下状態
   uint16_t rollingSpeed = 0;  // 回転スピード
   uint16_t rollingTimer = 0;  // 回転タイマー
@@ -45,7 +45,7 @@ public:
 
   // 乱数生成器の内部状態へのポインタを返す
   uint8_t *getRngStatePtr(uint8_t *size) {
-    *size = Xoshiro128plusplus::STATE_BYTES;
+    *size = Xoroshiro128plusplus::STATE_BYTES;
     return (uint8_t *)rng.state;
   }
 
