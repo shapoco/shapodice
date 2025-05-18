@@ -2056,7 +2056,7 @@
 		(uuid "2857c879-ee2f-4c09-bdb6-27fc7e2ff203")
 	)
 	(junction
-		(at 116.84 50.8)
+		(at 116.84 55.88)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "67db3f43-852f-4f1a-a9ec-1ffb37d991aa")
@@ -2151,16 +2151,6 @@
 	)
 	(wire
 		(pts
-			(xy 116.84 58.42) (xy 116.84 81.28)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "005b82b0-918d-4b13-8d2b-b99a46af0661")
-	)
-	(wire
-		(pts
 			(xy 81.28 58.42) (xy 81.28 55.88)
 		)
 		(stroke
@@ -2168,16 +2158,6 @@
 			(type default)
 		)
 		(uuid "074369ba-b5bf-47cf-b5c7-6a09d2560bf4")
-	)
-	(wire
-		(pts
-			(xy 121.92 63.5) (xy 121.92 66.04)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "0ab0d408-5d50-4ad4-91cb-82bca704bc30")
 	)
 	(wire
 		(pts
@@ -2311,6 +2291,16 @@
 	)
 	(wire
 		(pts
+			(xy 139.7 55.88) (xy 139.7 58.42)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3d6622bc-bb42-4444-8f33-e38b65c2498b")
+	)
+	(wire
+		(pts
 			(xy 142.24 81.28) (xy 152.4 81.28)
 		)
 		(stroke
@@ -2321,7 +2311,7 @@
 	)
 	(wire
 		(pts
-			(xy 116.84 48.26) (xy 116.84 50.8)
+			(xy 116.84 53.34) (xy 116.84 55.88)
 		)
 		(stroke
 			(width 0)
@@ -2571,13 +2561,23 @@
 	)
 	(wire
 		(pts
-			(xy 116.84 40.64) (xy 116.84 43.18)
+			(xy 116.84 45.72) (xy 116.84 48.26)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "85d9e1bf-4b5c-4cfb-a182-5664e4b737c4")
+	)
+	(wire
+		(pts
+			(xy 116.84 55.88) (xy 116.84 81.28)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "878babf3-41ec-46bc-a3b9-cc07e5645eb5")
 	)
 	(wire
 		(pts
@@ -2648,16 +2648,6 @@
 			(type default)
 		)
 		(uuid "a3e383c6-6c47-49fc-af1b-5115366d5982")
-	)
-	(wire
-		(pts
-			(xy 116.84 50.8) (xy 116.84 53.34)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a5117fb6-f7d5-43fe-93b7-412c1ba0deb3")
 	)
 	(wire
 		(pts
@@ -2761,6 +2751,16 @@
 	)
 	(wire
 		(pts
+			(xy 137.16 55.88) (xy 139.7 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d47ce931-ea28-4b1e-9b28-39e5000e2b05")
+	)
+	(wire
+		(pts
 			(xy 162.56 101.6) (xy 175.26 101.6)
 		)
 		(stroke
@@ -2788,16 +2788,6 @@
 			(type default)
 		)
 		(uuid "d95268be-1111-4202-8830-fd5c04fc8cb8")
-	)
-	(wire
-		(pts
-			(xy 121.92 50.8) (xy 121.92 53.34)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "dc4f6198-f39c-4a9d-af03-20671b114cee")
 	)
 	(wire
 		(pts
@@ -2871,6 +2861,16 @@
 	)
 	(wire
 		(pts
+			(xy 124.46 55.88) (xy 127 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f7c7e9a7-889b-4c5f-b004-028159e9cda7")
+	)
+	(wire
+		(pts
 			(xy 152.4 69.85) (xy 152.4 68.58)
 		)
 		(stroke
@@ -2881,7 +2881,7 @@
 	)
 	(wire
 		(pts
-			(xy 116.84 50.8) (xy 121.92 50.8)
+			(xy 116.84 55.88) (xy 119.38 55.88)
 		)
 		(stroke
 			(width 0)
@@ -2948,7 +2948,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "052a5d72-4adc-41e9-bfd2-e4ea7b93ea61")
-		(property "Reference" "D6"
+		(property "Reference" "D4"
 			(at 154.94 105.3464 90)
 			(effects
 				(font
@@ -3011,7 +3011,7 @@
 		(instances
 			(project "shapodice"
 				(path "/749e835f-ecb1-43a1-b2bf-be786da2ebe4"
-					(reference "D6")
+					(reference "D4")
 					(unit 1)
 				)
 			)
@@ -3019,7 +3019,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 121.92 66.04 0)
+		(at 139.7 58.42 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -3028,7 +3028,7 @@
 		(fields_autoplaced yes)
 		(uuid "08fdbe07-3329-4159-8f2e-4da20531b781")
 		(property "Reference" "#PWR06"
-			(at 121.92 72.39 0)
+			(at 139.7 64.77 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3037,7 +3037,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 121.92 71.12 0)
+			(at 139.7 63.5 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3045,7 +3045,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 121.92 66.04 0)
+			(at 139.7 58.42 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3054,7 +3054,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 121.92 66.04 0)
+			(at 139.7 58.42 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3063,7 +3063,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 121.92 66.04 0)
+			(at 139.7 58.42 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3084,78 +3084,8 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
-		(at 116.84 55.88 0)
-		(mirror y)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "0b9f140b-54b7-4ebb-9f8a-47ce81d9550b")
-		(property "Reference" "R1"
-			(at 114.3 54.6099 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "1k"
-			(at 114.3 57.1499 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" ""
-			(at 116.84 55.88 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 116.84 55.88 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Resistor, small symbol"
-			(at 116.84 55.88 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "070af131-ab74-4e92-ab7d-6640febf7cea")
-		)
-		(pin "2"
-			(uuid "8b833658-ed65-48e2-b1d9-5f828389e9c0")
-		)
-		(instances
-			(project "shapodice"
-				(path "/749e835f-ecb1-43a1-b2bf-be786da2ebe4"
-					(reference "R1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:C_Small")
-		(at 116.84 45.72 0)
+		(at 116.84 50.8 0)
 		(mirror x)
 		(unit 1)
 		(exclude_from_sim no)
@@ -3164,7 +3094,7 @@
 		(dnp no)
 		(uuid "1931e0bc-2e3a-4f60-843a-62fbd0d50532")
 		(property "Reference" "C1"
-			(at 114.3 44.4435 0)
+			(at 114.3 49.5235 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3173,7 +3103,7 @@
 			)
 		)
 		(property "Value" "0.1u"
-			(at 114.3 46.9835 0)
+			(at 114.3 52.0635 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3182,7 +3112,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 116.84 45.72 0)
+			(at 116.84 50.8 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3191,7 +3121,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 116.84 45.72 0)
+			(at 116.84 50.8 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3200,7 +3130,7 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor, small symbol"
-			(at 116.84 45.72 0)
+			(at 116.84 50.8 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3232,7 +3162,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "21a68d7f-4aba-45da-be40-ec076672d410")
-		(property "Reference" "D7"
+		(property "Reference" "D5"
 			(at 165.1 105.156 90)
 			(effects
 				(font
@@ -3295,7 +3225,7 @@
 		(instances
 			(project "shapodice"
 				(path "/749e835f-ecb1-43a1-b2bf-be786da2ebe4"
-					(reference "D7")
+					(reference "D5")
 					(unit 1)
 				)
 			)
@@ -3382,7 +3312,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "439e0813-3455-43b8-ba49-2a02b54d4879")
-		(property "Reference" "R5"
+		(property "Reference" "R4"
 			(at 154.94 95.2499 0)
 			(effects
 				(font
@@ -3391,7 +3321,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1k"
+		(property "Value" "470"
 			(at 154.94 97.7899 0)
 			(effects
 				(font
@@ -3436,7 +3366,7 @@
 		(instances
 			(project "shapodice"
 				(path "/749e835f-ecb1-43a1-b2bf-be786da2ebe4"
-					(reference "R5")
+					(reference "R4")
 					(unit 1)
 				)
 			)
@@ -3451,7 +3381,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "452506ad-ceb5-482c-bc52-0b45f12ba77c")
-		(property "Reference" "D5"
+		(property "Reference" "D3"
 			(at 144.78 105.156 90)
 			(effects
 				(font
@@ -3514,7 +3444,7 @@
 		(instances
 			(project "shapodice"
 				(path "/749e835f-ecb1-43a1-b2bf-be786da2ebe4"
-					(reference "D5")
+					(reference "D3")
 					(unit 1)
 				)
 			)
@@ -3529,7 +3459,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "4a16f678-f134-4a22-b051-c11815210197")
-		(property "Reference" "D8"
+		(property "Reference" "D6"
 			(at 172.72 110.4264 90)
 			(effects
 				(font
@@ -3592,7 +3522,7 @@
 		(instances
 			(project "shapodice"
 				(path "/749e835f-ecb1-43a1-b2bf-be786da2ebe4"
-					(reference "D8")
+					(reference "D6")
 					(unit 1)
 				)
 			)
@@ -3607,7 +3537,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "56fe9ad8-0ce9-4c3e-94f2-39c9c847219e")
-		(property "Reference" "D12"
+		(property "Reference" "D7"
 			(at 181.61 110.236 90)
 			(effects
 				(font
@@ -3670,7 +3600,75 @@
 		(instances
 			(project "shapodice"
 				(path "/749e835f-ecb1-43a1-b2bf-be786da2ebe4"
-					(reference "D12")
+					(reference "D7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R_Small")
+		(at 121.92 55.88 270)
+		(mirror x)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "5964e6d8-d53a-4eeb-9adc-1600f0fb3a5b")
+		(property "Reference" "R7"
+			(at 121.92 50.8 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "1k"
+			(at 121.92 53.34 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 121.92 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 121.92 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor, small symbol"
+			(at 121.92 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "cd74d2e3-8a6d-4a37-a3f8-48a4c2cbf026")
+		)
+		(pin "2"
+			(uuid "fb9c9803-6fed-4f9d-b221-8176f02b351c")
+		)
+		(instances
+			(project "shapodice"
+				(path "/749e835f-ecb1-43a1-b2bf-be786da2ebe4"
+					(reference "R7")
 					(unit 1)
 				)
 			)
@@ -3686,7 +3684,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "5bd55314-6f31-4165-b2db-6858298c4125")
-		(property "Reference" "R4"
+		(property "Reference" "R3"
 			(at 134.62 95.2499 0)
 			(effects
 				(font
@@ -3695,7 +3693,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1k"
+		(property "Value" "470"
 			(at 134.62 97.7899 0)
 			(effects
 				(font
@@ -3740,7 +3738,7 @@
 		(instances
 			(project "shapodice"
 				(path "/749e835f-ecb1-43a1-b2bf-be786da2ebe4"
-					(reference "R4")
+					(reference "R3")
 					(unit 1)
 				)
 			)
@@ -3756,7 +3754,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "6bab38ee-e9bf-4926-9d0d-2b2fe10e218f")
-		(property "Reference" "#PWR09"
+		(property "Reference" "#PWR02"
 			(at 81.28 46.99 0)
 			(effects
 				(font
@@ -3806,7 +3804,7 @@
 		(instances
 			(project "shapodice"
 				(path "/749e835f-ecb1-43a1-b2bf-be786da2ebe4"
-					(reference "#PWR09")
+					(reference "#PWR02")
 					(unit 1)
 				)
 			)
@@ -3823,7 +3821,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "6bb8ddd0-4654-4956-b66f-dad9065ca677")
-		(property "Reference" "#PWR010"
+		(property "Reference" "#PWR04"
 			(at 81.28 64.77 0)
 			(effects
 				(font
@@ -3873,7 +3871,7 @@
 		(instances
 			(project "shapodice"
 				(path "/749e835f-ecb1-43a1-b2bf-be786da2ebe4"
-					(reference "#PWR010")
+					(reference "#PWR04")
 					(unit 1)
 				)
 			)
@@ -3888,7 +3886,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "72951377-fab4-4e44-8079-3ba8b39ad36d")
-		(property "Reference" "D4"
+		(property "Reference" "D2"
 			(at 134.62 105.3464 90)
 			(effects
 				(font
@@ -3951,7 +3949,7 @@
 		(instances
 			(project "shapodice"
 				(path "/749e835f-ecb1-43a1-b2bf-be786da2ebe4"
-					(reference "D4")
+					(reference "D2")
 					(unit 1)
 				)
 			)
@@ -3966,7 +3964,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "7c4ed538-1100-41ed-901a-55bee066222c")
-		(property "Reference" "C3"
+		(property "Reference" "C2"
 			(at 99.06 54.6035 0)
 			(effects
 				(font
@@ -3975,7 +3973,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "0.1u"
+		(property "Value" "1u"
 			(at 99.06 57.1435 0)
 			(effects
 				(font
@@ -4020,7 +4018,7 @@
 		(instances
 			(project "shapodice"
 				(path "/749e835f-ecb1-43a1-b2bf-be786da2ebe4"
-					(reference "C3")
+					(reference "C2")
 					(unit 1)
 				)
 			)
@@ -4195,7 +4193,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "80e61243-30ce-491a-99cd-e653747fae32")
-		(property "Reference" "D11"
+		(property "Reference" "D10"
 			(at 165.1 115.316 90)
 			(effects
 				(font
@@ -4258,7 +4256,7 @@
 		(instances
 			(project "shapodice"
 				(path "/749e835f-ecb1-43a1-b2bf-be786da2ebe4"
-					(reference "D11")
+					(reference "D10")
 					(unit 1)
 				)
 			)
@@ -4274,7 +4272,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "84ee5ad5-28a7-4edf-91c6-f16b16f84ac3")
-		(property "Reference" "#PWR04"
+		(property "Reference" "#PWR03"
 			(at 91.44 52.07 0)
 			(effects
 				(font
@@ -4324,7 +4322,7 @@
 		(instances
 			(project ""
 				(path "/749e835f-ecb1-43a1-b2bf-be786da2ebe4"
-					(reference "#PWR04")
+					(reference "#PWR03")
 					(unit 1)
 				)
 			)
@@ -4340,7 +4338,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "864f3c88-0b2a-484a-9725-af0d58b9136d")
-		(property "Reference" "R6"
+		(property "Reference" "R5"
 			(at 134.62 125.7299 0)
 			(effects
 				(font
@@ -4349,7 +4347,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1k"
+		(property "Value" "470"
 			(at 134.62 128.2699 0)
 			(effects
 				(font
@@ -4394,7 +4392,7 @@
 		(instances
 			(project "shapodice"
 				(path "/749e835f-ecb1-43a1-b2bf-be786da2ebe4"
-					(reference "R6")
+					(reference "R5")
 					(unit 1)
 				)
 			)
@@ -4479,7 +4477,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "92674307-8465-429b-8f1d-1346c2a8f5ba")
-		(property "Reference" "D9"
+		(property "Reference" "D8"
 			(at 134.62 115.5064 90)
 			(effects
 				(font
@@ -4542,7 +4540,7 @@
 		(instances
 			(project "shapodice"
 				(path "/749e835f-ecb1-43a1-b2bf-be786da2ebe4"
-					(reference "D9")
+					(reference "D8")
 					(unit 1)
 				)
 			)
@@ -4550,34 +4548,32 @@
 	)
 	(symbol
 		(lib_id "Switch:SW_Push")
-		(at 121.92 58.42 270)
-		(mirror x)
+		(at 132.08 55.88 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "b6ec731b-d727-4cc4-95d8-879275191b78")
+		(fields_autoplaced yes)
+		(uuid "aed29787-d2a1-454a-be58-555cde906dc3")
 		(property "Reference" "SW1"
-			(at 125.73 57.1499 90)
+			(at 132.08 48.26 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
 			)
 		)
 		(property "Value" "START"
-			(at 125.73 59.6899 90)
+			(at 132.08 50.8 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" ""
-			(at 127 58.42 0)
+			(at 132.08 50.8 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4586,7 +4582,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 127 58.42 0)
+			(at 132.08 50.8 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4595,7 +4591,7 @@
 			)
 		)
 		(property "Description" "Push button switch, generic, two pins"
-			(at 121.92 58.42 0)
+			(at 132.08 55.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4603,14 +4599,14 @@
 				(hide yes)
 			)
 		)
-		(pin "1"
-			(uuid "9935788b-0deb-4f7b-89c8-7d2f863fae61")
-		)
 		(pin "2"
-			(uuid "8b40d411-b3f6-4799-a89d-107f07e2f943")
+			(uuid "058fdcf0-369a-4e23-bacf-02a8226c812c")
+		)
+		(pin "1"
+			(uuid "0b75348f-de56-435e-bffa-118868243483")
 		)
 		(instances
-			(project "shapodice"
+			(project ""
 				(path "/749e835f-ecb1-43a1-b2bf-be786da2ebe4"
 					(reference "SW1")
 					(unit 1)
@@ -4627,7 +4623,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "c0eee105-fe88-47c5-81a1-5910477d132f")
-		(property "Reference" "D3"
+		(property "Reference" "D1"
 			(at 154.94 71.1199 90)
 			(effects
 				(font
@@ -4681,7 +4677,7 @@
 		(instances
 			(project "shapodice"
 				(path "/749e835f-ecb1-43a1-b2bf-be786da2ebe4"
-					(reference "D3")
+					(reference "D1")
 					(unit 1)
 				)
 			)
@@ -4762,7 +4758,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "c7ecc7a4-433c-445f-8410-8be9a0e905b1")
-		(property "Reference" "R3"
+		(property "Reference" "R2"
 			(at 147.32 71.12 90)
 			(effects
 				(font
@@ -4814,7 +4810,7 @@
 		(instances
 			(project "shapodice"
 				(path "/749e835f-ecb1-43a1-b2bf-be786da2ebe4"
-					(reference "R3")
+					(reference "R2")
 					(unit 1)
 				)
 			)
@@ -4822,7 +4818,7 @@
 	)
 	(symbol
 		(lib_id "power:VCC")
-		(at 116.84 40.64 0)
+		(at 116.84 45.72 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -4830,7 +4826,7 @@
 		(dnp no)
 		(uuid "c9740dcc-08dd-4e56-b21c-937bb279cefb")
 		(property "Reference" "#PWR01"
-			(at 116.84 44.45 0)
+			(at 116.84 49.53 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4839,7 +4835,7 @@
 			)
 		)
 		(property "Value" "VCC"
-			(at 116.84 35.56 0)
+			(at 116.84 40.64 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4847,7 +4843,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 116.84 40.64 0)
+			(at 116.84 45.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4856,7 +4852,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 116.84 40.64 0)
+			(at 116.84 45.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4865,7 +4861,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"VCC\""
-			(at 116.84 40.64 0)
+			(at 116.84 45.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4961,7 +4957,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "d1e25875-e3b2-4f2d-b897-c47d5eb0d43f")
-		(property "Reference" "R7"
+		(property "Reference" "R6"
 			(at 154.94 125.7299 0)
 			(effects
 				(font
@@ -4970,7 +4966,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1k"
+		(property "Value" "470"
 			(at 154.94 128.2699 0)
 			(effects
 				(font
@@ -5015,7 +5011,7 @@
 		(instances
 			(project "shapodice"
 				(path "/749e835f-ecb1-43a1-b2bf-be786da2ebe4"
-					(reference "R7")
+					(reference "R6")
 					(unit 1)
 				)
 			)
@@ -5030,7 +5026,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "dd600560-15af-4abd-a623-b63b92f8847c")
-		(property "Reference" "D10"
+		(property "Reference" "D9"
 			(at 154.94 115.5064 90)
 			(effects
 				(font
@@ -5093,7 +5089,7 @@
 		(instances
 			(project "shapodice"
 				(path "/749e835f-ecb1-43a1-b2bf-be786da2ebe4"
-					(reference "D10")
+					(reference "D9")
 					(unit 1)
 				)
 			)
