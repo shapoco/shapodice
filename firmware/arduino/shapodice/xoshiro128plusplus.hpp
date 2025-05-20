@@ -18,20 +18,20 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. */
 //------------------------------------------------------------------------
 // 2025-05-13
 // Customized for Arduino sketch by Shapoco.
-// original: https://prng.di.unimi.it/xoroshiro128plusplus.c
+// original: https://prng.di.unimi.it/xoshiro128plusplus.c
 //------------------------------------------------------------------------
 
 #include <stdint.h>
 
 static inline uint32_t rotl(uint32_t x, uint8_t k) {
 	if (k >= 8) {
-		x = ((x << 24) & 0xff000000) | ((x >> 8) & 0x00ffffff);
+		x = ((x << 8) & 0xffffff00) | ((x >> 24) & 0x000000ff);
 		k -= 8;
 	}
 	return (x << k) | (x >> (32 - k));
 }
 
-class Xoroshiro128plusplus {
+class Xoshiro128plusplus {
 public:
 	uint32_t state[4] = { 0x12345678 };
 	static constexpr uint8_t STATE_BYTES = sizeof(state);
