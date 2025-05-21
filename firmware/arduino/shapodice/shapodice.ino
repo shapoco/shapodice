@@ -6,10 +6,10 @@
 #include <stdbool.h>
 
 #include <EEPROM.h>
-#include <avr/sleep.h>
-#include <avr/interrupt.h>
 
 #include "tinyio.hpp"
+#include "tinyadc.hpp"
+#include "tinypm.hpp"
 #include "dice_core.hpp"
 #include "dice_leds.hpp"
 #include "button.hpp"
@@ -158,7 +158,7 @@ void startup() {
 #endif
 
   // ADC 有効化 + 空読み
-  ADCSRA |= (1 << ADEN) | (0x7 << ADPS0);
+  tinyadc::enable();
   for (uint8_t i = 3; i != 0; i--) {
     analogRead(BATTERY_ADC);
   }
@@ -343,22 +343,13 @@ void powerDownControl(bool pulse1sec) {
 #endif
 
   // ADC 無効化
-  ADCSRA &= ~((1 << ADEN) | (0x7 << ADPS0));
+  tinyadc::disable();
 
   // 外部割り込み設定
   attachInterrupt(BUTTON_PORT, wakeup, RISING);
   GIMSK |= (1 << INT0);
 
-  // -------- ここから変更禁止 --------
-  // https://www.nongnu.org/avr-libc/user-manual/group__avr__sleep.html
-  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-  noInterrupts();
-  sleep_enable();
-  sleep_bod_disable();
-  interrupts();
-  sleep_cpu();
-  sleep_disable();
-  // -------- ここまで変更禁止 --------
+  tinypm::powerDown();
 
   // 外部割り込み無効化
   GIMSK &= ~(1 << INT0);
