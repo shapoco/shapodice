@@ -151,7 +151,7 @@ ATtiny25/45/85 はデフォルトでは Arduino IDE ではサポートされて�
 
 1. Arduino IDE を起動します。
 2. `Edit` → `Preferences` を開き、`Additional boards manager URLs` の入力欄の右にある ![参照ボタン](./images/arduino_browse_button.svg) を開きます。
-3. URL の入力欄に `http://drazzy.com/package_drazzy.com_index.json` を追加します。既に他の URL が入力されている場合は行を追加してください。
+3. URL の入力欄に `https://drazzy.com/package_drazzy.com_index.json` を追加します。既に他の URL が入力されている場合は行を追加してください。
 
     ![](./images/arduino_attinycore_board_url_list.png)
 
