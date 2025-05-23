@@ -86,7 +86,7 @@
     </tr>
 </table>
 
-公式のプログラマが安心ですが、入手性が悪い場合や高くて手が出ない場合はサードパーティの製品の購入をお勧めします。USBasp や USBtinyISP は自作することも可能ですが、それら自身も AVR を使用するため、自作したものを使用できる状態にするには結局他のプログラマが必要になります。
+公式のプログラマが安心ですが、入手が難しい場合は USBasp や USBtinyISP をお勧めします。USBasp や USBtinyISP は自作することも可能ですが、それら自身も AVR を使用しているため、自作したものを使用できる状態にするには結局他のプログラマが必要になります。
 
 ### MPLAB PICkit 5
 
@@ -210,23 +210,19 @@ Arduino スケッチを書き込む前に「ヒューズ」を書き込む必要
     |Timer 1 Clock|CPU (CPU frequency)||
     |Programmer|使用するプログラマを選択|※4|
 
-    > [!CAUTION]
-    > **※1)** `Clock Source` の選択は重要なので間違えないようにしてください。特に `(external)` と入っているクロックを選択した場合、書き込み完了と同時に ATtiny が「文鎮化」してしまい、復活させるには外部からクロック信号を入力する必要があり、面倒です。
+    **※1)** ⚠️ **`Clock Source` の選択は重要なので間違えないようにしてください。**
+    特に末尾に `(external)` と入っているクロックを選択した場合、書き込み完了と同時に ATtiny が「文鎮化」してしまい、復活させるには外部からクロック信号を入力する必要があり、面倒です。
 
-    > [!NOTE]
-    > **※2)** LTO (Link Time Optimization) はスケッチの書き込み時に効きます。ヒューズには影響しません。
+    **※2)** LTO (Link Time Optimization) はスケッチの書き込み時に効きます。ヒューズには影響しません。
 
-    > [!NOTE]
-    > **※3)** ATtiny45/85 の場合は `millis()/micros()` は Enabled でもかまいません。Disabled の方が Flash 容量を節約できますが、`millis()` や `micros()` は使えなくなります (ShapoDice では使用しません)。
+    **※3)** ATtiny45/85 の場合は `millis()/micros()` は `Enabled` でもかまいません。`Disabled` の方が Flash 容量を節約できますが、`millis()` や `micros()` は使えなくなります (ShapoDice では使用しません)。
 
-    > [!NOTE]
-    > **※4)** Arduino UNO **R4** を Arduino as ISP として使用する場合は、`Programmer` として`Arduino as ISP` ではなく `Arduino Leo/Micro as ISP (ATmega32U4)` を選択してください。<br>
-    > 参考: [Can I use the R4 minima as an icsp? - Classic / UNO R4 Minima - Arduino Forum](https://forum.arduino.cc/t/can-i-use-the-r4-minima-as-an-icsp/1170056/4)
+    **※4)** Arduino UNO **R4** を Arduino as ISP として使用する場合は、`Programmer` として`Arduino as ISP` ではなく `Arduino Leo/Micro as ISP (ATmega32U4)` を選択してください。<br>
+    参考: [Can I use the R4 minima as an icsp? - Classic / UNO R4 Minima - Arduino Forum](https://forum.arduino.cc/t/can-i-use-the-r4-minima-as-an-icsp/1170056/4)
 
 4. `Tools` → `Burn Bootloader` をクリックします。ShapoDice はブートローダーを使用しないので、書き込まれるのはヒューズだけです。
 
-    > [!CAUTION]
-    > 書き込み中は ShapoDice に触れないでください。スイッチを操作すると ATtiny が文鎮化する恐れがあります。
+    ⚠️ **書き込み中は ShapoDice に触れないでください。**スイッチを操作すると ATtiny が文鎮化する恐れがあります。
 
 ----
 
